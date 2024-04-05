@@ -8,7 +8,6 @@ auto param = ini.Get<TYPE>(Section, Name); // Section为[]中的字符串，Name
 ```
 
 Example:  
-file in path "src/nodes/mynode/config/sys_config.ini":
 
 ```text
 [Common]
@@ -18,6 +17,6 @@ length = 10 # 长度
 cpp:
 
 ```cpp
-auto ini = IniReader{ros::package::getPath("mynode") + "/config/sys_config.ini"};
+auto ini = IniReader{"path/to/config.ini"};
 auto length = ini.Get<double>("Common", "length");
 ```
