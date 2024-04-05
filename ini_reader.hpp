@@ -1,7 +1,7 @@
 /**
  * Created Time: 2023.03.21
  * File name:    ini_reader.h
- * Author:       zgy(zhangguangyan@wicri.org)
+ * Author:       zgy(zgggy@foxmail.com)
  * Brief:        一个简单的读取ini文件的工具类，可以将ini转化为map
  * Include:      IniReader{}
  *
@@ -34,12 +34,12 @@ class IniReader {
 
   private:
     std::map<std::string, std::map<std::string, IniReader::IniLine>> ini_map_;
-    std::map<std::string, std::map<std::string, std::string>>        description_map_;
+    std::map<std::string, std::map<std::string, std::string>>        comment_map_;
     std::string                                                      file_name_;
-    std::string                                                      option_comment_characters_;
+    std::string                                                      comment_symbol_;
 
   public:
-    IniReader(const std::string& file_name) : option_comment_characters_(";#") {
+    IniReader(const std::string& file_name) : comment_symbol_(";#") {
         if (file_name != "")
             if (not Load(file_name)) std::cerr << "Unable to open the file " + file_name << std::endl;
     }
@@ -113,15 +113,15 @@ class IniReader {
                 if (pos == std::string::npos) pos = line.length();
                 section = Trim(line.substr(1, pos - 1));
                 if (comment != "") {
-                    description_map_[section][""] = comment;
+                    comment_map_[section][""] = comment;
                     comment                       = "";
                 }
                 continue;
             }
             // comments
             pos = std::string::npos;
-            for (unsigned int i = 0; i < option_comment_characters_.length(); ++i) {
-                pos2 = line.find_first_of(option_comment_characters_[i]);
+            for (unsigned int i = 0; i < comment_symbol_.length(); ++i) {
+                pos2 = line.find_first_of(comment_symbol_[i]);
                 if (pos2 == std::string::npos) continue;
                 if (pos == std::string::npos) {
                     pos = pos2;
@@ -149,7 +149,7 @@ class IniReader {
             key                    = Trim(line);
             ini_map_[section][key] = iniLine;
             if (comment != "") {
-                description_map_[section][key] = comment;
+                comment_map_[section][key] = comment;
                 comment                        = "";
             }
         }
