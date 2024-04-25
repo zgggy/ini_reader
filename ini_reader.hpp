@@ -24,6 +24,8 @@
 #include <map>
 #include <sstream>
 #include <string>
+#include <vector>
+#include <algorithm>
 
 class IniReader {
   private:
@@ -63,6 +65,7 @@ class IniReader {
     }
 
     auto Trim(const std::string& str) -> std::string {
+        std::cout << "1: " << str << std::endl;
         auto deb = size_t{0};
         auto fin = str.size();
         auto chr = char{};
@@ -76,6 +79,8 @@ class IniReader {
             if ((chr != ' ') && (chr != '\t')) break;
             fin--;
         }
+        std::cout << "2: " << str << std::endl;
+        std::cout << "3: " << str.substr(deb, fin - deb) << std::endl;
         return str.substr(deb, fin - deb);
     }
 
@@ -114,7 +119,7 @@ class IniReader {
                 section = Trim(line.substr(1, pos - 1));
                 if (comment != "") {
                     comment_map_[section][""] = comment;
-                    comment                       = "";
+                    comment                   = "";
                 }
                 continue;
             }
@@ -143,14 +148,16 @@ class IniReader {
             pos = line.find_first_of('=');
             if (pos != std::string::npos) {
                 iniLine.value = Trim(line.substr(pos + 1, length - pos));
+                std::cout << "4: " << iniLine.value << std::endl;
                 line.erase(pos, length - pos);
+                std::cout << "5: " << line << std::endl;
             }
             // save to map
             key                    = Trim(line);
             ini_map_[section][key] = iniLine;
             if (comment != "") {
                 comment_map_[section][key] = comment;
-                comment                        = "";
+                comment                    = "";
             }
         }
         file.close();
@@ -168,7 +175,8 @@ class IniReader {
                 std::cerr << "key " + key + " not found!" << std::endl;
         } else
             std::cerr << "section " + section + " not found!" << std::endl;
-
+        std::cout << "[" << section << "]." << key << " "
+                  << "get value: " << value << std::endl;
         auto result = T{};
         if (value != std::string(";")) {
             auto ss = std::stringstream{};
@@ -176,6 +184,24 @@ class IniReader {
             ss >> result;
         }
         return result;
+    }
+
+    template <class T>
+    auto GetVec(const std::string& section, const std::string& key) -> std::vector<T> {
+        auto value      = std::string{";"};
+        auto it_section = ini_map_.find(section);
+        if (it_section != ini_map_.end()) {
+            if (it_section->second.find(key) != it_section->second.end())
+                value = it_section->second.find(key)->second.value;
+            else
+                std::cerr << "key " + key + " not found!" << std::endl;
+        } else
+            std::cerr << "section " + section + " not found!" << std::endl;
+        auto result = std::vector<T>{};
+        value.erase(std::remove(value.begin(), value.end(), ' '), value.end());
+        value.erase(std::remove(value.begin(), value.end(), '['), value.end());
+        value.erase(std::remove(value.begin(), value.end(), ']'), value.end());
+        std::cout << "result: "<<value << std::endl;
     }
 
     auto GetComment(const std::string& section, const std::string& key) -> std::string {
