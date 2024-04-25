@@ -1,3 +1,0 @@
-/home/zgy/Learn/ini_reader/build/CMakeFiles/rebuild_cache.dir
-/home/zgy/Learn/ini_reader/build/CMakeFiles/edit_cache.dir
-/home/zgy/Learn/ini_reader/build/CMakeFiles/demo.dir
