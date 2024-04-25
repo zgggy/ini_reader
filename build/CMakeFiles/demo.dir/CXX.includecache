@@ -1,0 +1,34 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/zgy/Learn/ini_reader/demo/demo.cc
+string
+-
+vector
+-
+../ini_reader.hpp
+/home/zgy/Learn/ini_reader/ini_reader.hpp
+
+/home/zgy/Learn/ini_reader/ini_reader.hpp
+algorithm
+-
+fstream
+-
+iostream
+-
+map
+-
+regex
+-
+sstream
+-
+string
+-
+vector
+-
+

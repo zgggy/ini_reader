@@ -19,13 +19,14 @@
 #ifndef __INI_READER__
 #define __INI_READER__
 
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <map>
+#include <regex>
 #include <sstream>
 #include <string>
 #include <vector>
-#include <algorithm>
 
 class IniReader {
   private:
@@ -65,7 +66,6 @@ class IniReader {
     }
 
     auto Trim(const std::string& str) -> std::string {
-        std::cout << "1: " << str << std::endl;
         auto deb = size_t{0};
         auto fin = str.size();
         auto chr = char{};
@@ -79,8 +79,6 @@ class IniReader {
             if ((chr != ' ') && (chr != '\t')) break;
             fin--;
         }
-        std::cout << "2: " << str << std::endl;
-        std::cout << "3: " << str.substr(deb, fin - deb) << std::endl;
         return str.substr(deb, fin - deb);
     }
 
@@ -148,9 +146,7 @@ class IniReader {
             pos = line.find_first_of('=');
             if (pos != std::string::npos) {
                 iniLine.value = Trim(line.substr(pos + 1, length - pos));
-                std::cout << "4: " << iniLine.value << std::endl;
                 line.erase(pos, length - pos);
-                std::cout << "5: " << line << std::endl;
             }
             // save to map
             key                    = Trim(line);
@@ -188,6 +184,15 @@ class IniReader {
 
     template <class T>
     auto GetVec(const std::string& section, const std::string& key) -> std::vector<T> {
+        auto string_split = [](const std::string& str, const std::string& split) {
+            std::regex                 reg(split); // 匹配split
+            std::sregex_token_iterator pos(str.begin(), str.end(), reg, -1);
+            decltype(pos)              end; // 自动推导类型
+            std::vector<std::string>   res;
+            for (; pos != end; ++pos) res.emplace_back(pos->str());
+            return res;
+        };
+
         auto value      = std::string{";"};
         auto it_section = ini_map_.find(section);
         if (it_section != ini_map_.end()) {
@@ -201,7 +206,19 @@ class IniReader {
         value.erase(std::remove(value.begin(), value.end(), ' '), value.end());
         value.erase(std::remove(value.begin(), value.end(), '['), value.end());
         value.erase(std::remove(value.begin(), value.end(), ']'), value.end());
-        std::cout << "result: "<<value << std::endl;
+        value.erase(std::remove(value.begin(), value.end(), '{'), value.end());
+        value.erase(std::remove(value.begin(), value.end(), '}'), value.end());
+        auto value_vec = string_split(value, ",");
+        for (auto v : value_vec) {
+            auto r = T{};
+            if (v != std::string(";")) {
+                auto ss = std::stringstream{};
+                ss << v;
+                ss >> r;
+            }
+            result.emplace_back(r);
+        }
+        return result;
     }
 
     auto GetComment(const std::string& section, const std::string& key) -> std::string {
