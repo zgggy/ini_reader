@@ -184,8 +184,8 @@ class IniReader {
 
     template <class T>
     auto GetVec(const std::string& section, const std::string& key) -> std::vector<T> {
-        auto string_split = [](const std::string& str, const std::string& split) {
-            std::regex                 reg(split); // 匹配split
+        auto string_split = [](const std::string& str, const std::string& splitor) {
+            std::regex                 reg(splitor); // 匹配split
             std::sregex_token_iterator pos(str.begin(), str.end(), reg, -1);
             decltype(pos)              end; // 自动推导类型
             std::vector<std::string>   res;
